@@ -136,6 +136,18 @@ window.BOOKS = [
     "summary": "配合《四书章句集注》一起读。"
   },
   {
+    "id": "sunzibingfa",
+    "title": "孙子兵法",
+    "author": "孙子",
+    "publisher": "中华书局",
+    "year": 2011,
+    "category": "经典",
+    "tags": ["四书", "常读常新","军事"],
+    "status": "done",
+    "cover":"images/孙子兵法.jpg",
+    "summary": "认识经典。"
+  },
+  {
     "id": "万历十五年",
     "title": "万历十五年",
     "author": "黄仁宇",
@@ -145,7 +157,7 @@ window.BOOKS = [
     "progress": 100,
     "rating": 5,
     "finishedAt": "2026-08-20",
-    "cover": "images/万历十五年.jpg",
+    "cover": "https://img.alicdn.com/bao/uploaded/i1/707890731/O1CN01MxbWan1HGq91LveQQ_!!0-item_pic.jpg",
     "summary": "一个平淡年份的横切面，处处显出制度积弊"
   }
 ];
