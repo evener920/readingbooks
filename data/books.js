@@ -136,7 +136,8 @@ window.BOOKS = [
   },
   {
     "id": "sunzibingfa",
-    "title": "孙子兵法-深度阅读",
+    "title": "孙子兵法",
+    "cover": "images/孙子兵法.jpg"
     "author": "孙子",
     "publisher": "中华书局",
     "year": 2011,
