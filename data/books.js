@@ -138,13 +138,13 @@ window.BOOKS = [
   {
     "id": "sunzibingfa",
     "title": "孙子兵法",
-    "cover": "images/孙子兵法.jpg",
     "author": "孙子",
     "publisher": "中华书局",
     "year": 2011,
     "category": "经典",
     "tags": ["四书", "常读常新"],
     "status": "done",
+    "cover": "images/孙子兵法.jpg",
     "summary": "认识经典"
   }
 ];
