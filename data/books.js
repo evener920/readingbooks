@@ -123,15 +123,26 @@ window.BOOKS = [
     "status": "wish",
     "summary": "想系统读一遍散曲与杂剧。"
   },
+   {
+    "id": "sample-yuanqu",
+    "title": "元曲选",
+    "author": "臧懋循 编",
+    "publisher": "中华书局",
+    "year": 1958,
+    "category": "文学",
+    "tags": ["古典戏曲", "诗词曲"],
+    "status": "wish",
+    "summary": "想系统读一遍散曲与杂剧。"
+  },
   {
-    "id": "sample-zhongyong",
-    "title": "中庸章句",
-    "author": "朱熹",
+    "id": "孙子兵法-深度阅读",
+    "title": "孙子兵法-深度阅读",
+    "author": "孙子",
     "publisher": "中华书局",
     "year": 2011,
     "category": "经典",
     "tags": ["四书", "常读常新"],
-    "status": "wish",
-    "summary": "配合《四书章句集注》一起读。"
+    "status": "done",
+    "summary": "认识经典"
   }
 ];
