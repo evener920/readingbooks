@@ -68,7 +68,6 @@ window.BOOKS = [
   {
     "id": "sample-hongloumeng",
     "title": "红楼梦",
-    "cover": "images/sample-hongloumeng.jpg",
     "author": "曹雪芹",
     "publisher": "人民文学出版社",
     "year": 1996,
@@ -79,6 +78,7 @@ window.BOOKS = [
     "rating": 5,
     "startedAt": "2024-11-02",
     "finishedAt": "2025-02-18",
+    "cover": "images/sample-hongloumeng.jpg",
     "summary": "一座大观园，写尽盛衰与人情。",
     "quotes": ["世事洞明皆学问，人情练达即文章。"]
   },
@@ -124,27 +124,28 @@ window.BOOKS = [
     "status": "wish",
     "summary": "想系统读一遍散曲与杂剧。"
   },
-   {
-    "id": "sample-yuanqu",
-    "title": "元曲选",
-    "author": "臧懋循 编",
-    "publisher": "中华书局",
-    "year": 1958,
-    "category": "文学",
-    "tags": ["古典戏曲", "诗词曲"],
-    "status": "wish",
-    "summary": "想系统读一遍散曲与杂剧。"
-  },
   {
-    "id": "sunzibingfa",
-    "title": "孙子兵法",
-    "author": "孙子",
+    "id": "sample-zhongyong",
+    "title": "中庸章句",
+    "author": "朱熹",
     "publisher": "中华书局",
     "year": 2011,
     "category": "经典",
     "tags": ["四书", "常读常新"],
+    "status": "wish",
+    "summary": "配合《四书章句集注》一起读。"
+  },
+  {
+    "id": "万历十五年",
+    "title": "万历十五年",
+    "author": "黄仁宇",
+    "category": "历史",
+    "tags": ["明史", "大历史观"],
     "status": "done",
-    "cover": "images/孙子兵法.jpg",
-    "summary": "认识经典"
+    "progress": 100,
+    "rating": 5,
+    "finishedAt": "2026-08-20",
+    "cover": "images/万历十五年.jpg",
+    "summary": "一个平淡年份的横切面，处处显出制度积弊"
   }
 ];
