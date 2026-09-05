@@ -136,6 +136,6 @@ window.BOOKS = [
     "rating": 5,
     "startedAt": "2026/1/1",
     "finishedAt": "2026/9/4",
-    "cover": "images/sunzibingfa.jpg",
+    "cover": "images/孙子兵法.jpg",
   },
 ];
