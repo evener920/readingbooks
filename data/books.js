@@ -135,7 +135,7 @@ window.BOOKS = [
     "summary": "想系统读一遍散曲与杂剧。"
   },
   {
-    "id": "孙子兵法-深度阅读",
+    "id": "sunzibingfa",
     "title": "孙子兵法-深度阅读",
     "author": "孙子",
     "publisher": "中华书局",
