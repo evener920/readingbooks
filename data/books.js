@@ -68,6 +68,7 @@ window.BOOKS = [
   {
     "id": "sample-hongloumeng",
     "title": "红楼梦",
+    "cover": "images/sample-hongloumeng.jpg"
     "author": "曹雪芹",
     "publisher": "人民文学出版社",
     "year": 1996,
