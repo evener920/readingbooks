@@ -1,16 +1,21 @@
 /* ==========================================================================
  *  我的读书库 · 首页交互
- *  纯静态，无依赖。数据来自 data/books.js 里的 window.BOOKS
+ *  纯静态，无依赖。数据来自 data/books.csv（运行时读取）。
  *  点卡片会跳转到该书的独立页面 books/<id>.html
+ *
+ *  读取顺序：先尝试拉取 data/books.csv → 解析成书单；
+ *            若拉取失败（如本地直接双击打开 file://），则回退到
+ *            data/books.js 里的 window.BOOKS（兜底备份）。
  * ========================================================================== */
 (function () {
   "use strict";
 
-  var BOOKS = (window.BOOKS || []).slice();
+  var BOOKS = [];   // 由 loadData 填充
   var STATUS_LABEL = { wish: "想读", reading: "在读", done: "已读" };
 
   /* 自动生成书封用的配色（改这里，books/ 下页面的配色要同步改
-     scripts/build_pages.py 里的 PALETTE，两处保持一致） */
+     scripts/rl_data.py 上方 PALETTE 注释 / build_pages.py 里的 PALETTE，
+     两处保持一致） */
   var PALETTE = [
     ["#3d6b58", "#1f3a30"], ["#8a5a3b", "#4a2f1c"], ["#3f5b7d", "#22354d"],
     ["#7a4b5e", "#43273a"], ["#6a6a3f", "#3b3b22"], ["#4a4a6b", "#262640"],
@@ -60,6 +65,56 @@
     return "books/" + encodeURIComponent(b.id || "") + ".html";
   }
 
+  /* -------------------------------------------------- CSV 解析（RFC4180） -- */
+  function parseCSV(text) {
+    text = String(text).replace(/\r\n?/g, "\n");
+    var rows = [], row = [], field = "", i = 0, n = text.length, inQ = false;
+    while (i < n) {
+      var c = text[i];
+      if (inQ) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+          inQ = false; i++; continue;
+        }
+        field += c; i++; continue;
+      }
+      if (c === '"') { inQ = true; i++; continue; }
+      if (c === ',') { row.push(field); field = ""; i++; continue; }
+      if (c === '\n') { row.push(field); rows.push(row); row = []; field = ""; i++; continue; }
+      field += c; i++;
+    }
+    if (field !== "" || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function csvToBooks(text) {
+    var rows = parseCSV(text).filter(function (r) {
+      return r.length && !(r.length === 1 && r[0].trim() === "");
+    });
+    if (!rows.length) return [];
+    var header = rows[0].map(function (h) { return h.trim(); });
+    var out = [];
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i];
+      if (r.length === 1 && r[0].trim() === "") continue;
+      var o = {}, j;
+      for (j = 0; j < header.length; j++) o[header[j]] = (r[j] !== undefined) ? r[j] : "";
+      o.id = (o.id || "").trim();
+      o.title = (o.title || "").trim();
+      if (!o.title) continue;   // 没书名的行跳过
+      var splitList = function (s) {
+        return s ? s.split(";").map(function (x) { return x.trim(); }).filter(Boolean) : [];
+      };
+      o.tags = splitList(o.tags);
+      o.quotes = splitList(o.quotes);
+      o.progress = o.progress ? (parseInt(o.progress, 10) || 0) : 0;
+      o.rating = o.rating ? (parseInt(o.rating, 10) || 0) : 0;
+      o.year = o.year ? parseInt(o.year, 10) : "";
+      out.push(o);
+    }
+    return out;
+  }
+
   /* ------------------------------------------------------------ 统计 -- */
   function renderStats() {
     var total = BOOKS.length;
@@ -106,7 +161,7 @@
 
     if (!list.length) {
       grid.innerHTML = '<div class="empty"><div class="big">这里还空着</div>' +
-        "<div>换个关键词，或者往 <code>data/books.js</code> 里加本书</div></div>";
+        "<div>换个关键词，或者往 <code>data/books.csv</code> 里加一行</div></div>";
       return;
     }
 
@@ -179,7 +234,26 @@
     render();
   }
 
+  /* -------------------------------------------------- 加载数据（CSV 优先） -- */
+  function loadData(done) {
+    function fallback() {
+      BOOKS = (window.BOOKS || []).slice();
+      done();
+    }
+    if (typeof fetch !== "function") { fallback(); return; }
+    fetch("data/books.csv", { cache: "no-cache" })
+      .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.text(); })
+      .then(function (t) {
+        try { BOOKS = csvToBooks(t); }
+        catch (e) { BOOKS = (window.BOOKS || []).slice(); }
+        done();
+      })
+      .catch(function () { fallback(); });
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else { init(); }
+    document.addEventListener("DOMContentLoaded", function () { loadData(init); });
+  } else {
+    loadData(init);
+  }
 })();
