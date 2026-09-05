@@ -68,7 +68,7 @@ window.BOOKS = [
   {
     "id": "sample-hongloumeng",
     "title": "红楼梦",
-    "cover": "images/sample-hongloumeng.jpg"
+    "cover": "images/sample-hongloumeng.jpg",
     "author": "曹雪芹",
     "publisher": "人民文学出版社",
     "year": 1996,
@@ -138,7 +138,7 @@ window.BOOKS = [
   {
     "id": "sunzibingfa",
     "title": "孙子兵法",
-    "cover": "images/孙子兵法.jpg"
+    "cover": "images/孙子兵法.jpg",
     "author": "孙子",
     "publisher": "中华书局",
     "year": 2011,
