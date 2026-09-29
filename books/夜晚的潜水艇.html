@@ -932,7 +932,7 @@ body{padding-top:46px}
   var PASS_KEY = 'yedy-sync-pass';
   var EP_KEY = 'yedy-sync-endpoint';
   var BOOK = document.title || 'page';
-  var SYNC_ENDPOINT = ''; // 默认空；首次同步时可浏览器内填写，或在此硬编码你的 Worker 地址
+  var SYNC_ENDPOINT = 'https://readingbooks-hl-sync.evener920.workers.dev'; // 已部署的同步后端；首次同步只需设一句口令即可跨设备同步
   var bar = document.getElementById('hlBar');
   var addBtn = document.getElementById('hlAdd');
   var clrBtn = document.getElementById('hlClr');

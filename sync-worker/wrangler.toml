@@ -1,11 +1,12 @@
 name = "readingbooks-hl-sync"
 main = "src/index.js"
 compatibility_date = "2024-09-23"
+account_id = "82129ffe005dfd5010505adf73de06cb"
 
 # KV 命名空间：先 `wrangler kv namespace create HL_KV` 拿到 id，填到下面
 [[kv_namespaces]]
 binding = "HL_KV"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "7d63eb641f1045588612898e72262738"
 
 # 部署步骤（需 Cloudflare 令牌，权限含 Workers Scripts:Edit + Workers KV Storage:Edit）：
 # 1) npm i -g wrangler
