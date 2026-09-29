@@ -87,7 +87,9 @@
     }
   </style>
   <script>
-  (function(){
+  // 必须等 DOM 就绪后再抓取元素：本脚本位于 <head>，若直接执行，body 尚未解析，
+  // querySelectorAll 会拿到空列表，导致右侧 AI 笔记卡永远不显示。
+  document.addEventListener('DOMContentLoaded', function(){
     var cards = document.querySelectorAll('.notes-panel .note-card');
     var tocs  = document.querySelectorAll('.toc-item');
     var chapters = document.querySelectorAll('.chapter');
@@ -105,7 +107,7 @@
       });
     },{rootMargin:'-20% 0px -65% 0px'});
     chapters.forEach(function(c){obs.observe(c);});
-  })();
+  });
   </script>
 <style>
 .rb-nav{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;gap:10px;padding:0 18px;background:rgba(247,243,236,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #e4dccd;z-index:9999;font-family:"Noto Sans SC","PingFang SC",system-ui,sans-serif;font-size:14px}
