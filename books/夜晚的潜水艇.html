@@ -128,12 +128,14 @@ body{padding-top:46px}
   .hl-bar button:hover{background:#f1ebdf}
   .hl-bar .hl-add{color:#9a3b2e;font-weight:600}
   .hl-bar .hl-clr{color:#37535e}
-  .rb-clear{margin-left:auto;color:#9a3b2e;text-decoration:none;font-weight:600;cursor:pointer}
+  .rb-clear{color:#9a3b2e;text-decoration:none;font-weight:600;cursor:pointer}
   .rb-clear:hover{text-decoration:underline}
+  .rb-sync{margin-left:auto;color:#37535e;text-decoration:none;font-weight:600;cursor:pointer}
+  .rb-sync:hover{text-decoration:underline}
 </style>
 </head>
 <body>
-<header class="rb-nav"><a class="rb-home" href="../index.html">← 读书库</a><span class="rb-sep">·</span><span class="rb-t">夜晚的潜水艇 · 陈春成（AI 阅读笔记版）</span><span class="rb-sep">·</span><a class="rb-clear" id="hlClear" href="javascript:void(0)">清除高亮</a></header>
+<header class="rb-nav"><a class="rb-home" href="../index.html">← 读书库</a><span class="rb-sep">·</span><span class="rb-t">夜晚的潜水艇 · 陈春成（AI 阅读笔记版）</span><a class="rb-sync" id="hlSync" href="javascript:void(0)">☁ 同步</a><span class="rb-sep">·</span><a class="rb-clear" id="hlClear" href="javascript:void(0)">清除高亮</a></header>
   <div class="layout">
     <main class="text-col">
   <section class="title-page" id="top">
@@ -927,10 +929,16 @@ body{padding-top:46px}
   var root = document.querySelector('.text-col');
   if(!root) return;
   var KEY = 'yedy-hl-' + (document.title||'page');
+  var PASS_KEY = 'yedy-sync-pass';
+  var EP_KEY = 'yedy-sync-endpoint';
+  var BOOK = document.title || 'page';
+  var SYNC_ENDPOINT = ''; // 默认空；首次同步时可浏览器内填写，或在此硬编码你的 Worker 地址
   var bar = document.getElementById('hlBar');
   var addBtn = document.getElementById('hlAdd');
   var clrBtn = document.getElementById('hlClr');
+  var syncBtn = document.getElementById('hlSync');
   var pending = null;
+  function hid(h){return h.start+'_'+h.end;}
 
   function textNodes(){var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),a=[],n;while((n=w.nextNode()))a.push(n);return a;}
   function offsetOf(node,off){var ns=textNodes(),t=0;for(var i=0;i<ns.length;i++){if(ns[i]===node)return t+off;t+=ns[i].nodeValue.length;}return t;}
@@ -940,7 +948,12 @@ body{padding-top:46px}
   function render(){
     if(!window.CSS||!CSS.highlights) return;
     var arr=load(),rs=[];
-    arr.forEach(function(h){var a=atOffset(h.start),b=atOffset(h.end);if(a.node===b.node&&a.offset===b.offset)return;var r=new Range();r.setStart(a.node,a.offset);r.setEnd(b.node,b.offset);rs.push(r);});
+    arr.forEach(function(h){
+      if(h.del) return;
+      var a=atOffset(h.start),b=atOffset(h.end);
+      if(a.node===b.node&&a.offset===b.offset)return;
+      var r=new Range();r.setStart(a.node,a.offset);r.setEnd(b.node,b.offset);rs.push(r);
+    });
     CSS.highlights.set('user', new Highlight.apply(null, rs));
   }
   function selOffsets(){
@@ -975,8 +988,14 @@ body{padding-top:46px}
   addBtn.addEventListener('mousedown',function(e){e.preventDefault();});
   addBtn.addEventListener('click',function(){
     if(!pending) return;
-    var arr=load();arr.push(pending);save(arr);render();hideBar();
+    var o=pending, id=o.start+'_'+o.end;
+    var arr=load();
+    var ex=arr.find(function(h){return hid(h)===id;});
+    if(ex){ex.start=o.start;ex.end=o.end;ex.del=false;ex.ts=Date.now();}
+    else arr.push({id:id,start:o.start,end:o.end,del:false,ts:Date.now()});
+    save(arr);render();hideBar();
     window.getSelection().removeAllRanges();
+    scheduleSync();
   });
   clrBtn.addEventListener('mousedown',function(e){e.preventDefault();});
   clrBtn.addEventListener('click',function(){save([]);render();hideBar();});
@@ -991,11 +1010,93 @@ body{padding-top:46px}
     var off=offsetAtPoint(e.clientX,e.clientY);
     if(off<0) return;
     var arr=load();
-    var keep=arr.filter(function(h){return !(off>=h.start&&off<h.end);});
-    if(keep.length!==arr.length){save(keep);render();}
+    var hit=false;
+    arr.forEach(function(h){
+      if(!h.del && off>=h.start && off<h.end){h.del=true;h.ts=Date.now();hit=true;}
+    });
+    if(hit){save(arr);render();scheduleSync();}
   });
   var clearAll=document.getElementById('hlClear');
-  if(clearAll) clearAll.addEventListener('click',function(){save([]);render();});
+  if(clearAll) clearAll.addEventListener('click',function(){nukeAll();});
+
+  // ---------- 云同步 ----------
+  function getEndpoint(){return (SYNC_ENDPOINT||localStorage.getItem(EP_KEY)||'').trim();}
+  function hashStr(str){
+    if(window.crypto&&crypto.subtle){
+      return crypto.subtle.digest('SHA-256',new TextEncoder().encode(str)).then(function(b){
+        return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+      });
+    }
+    var h=5381;for(var i=0;i<str.length;i++){h=((h<<5)+h+str.charCodeAt(i))>>>0;}
+    return Promise.resolve(h.toString(16));
+  }
+  function getPass(){
+    var p=localStorage.getItem(PASS_KEY);
+    if(!p){
+      p=prompt('设置同步口令（用于跨设备识别你的高亮，只需设一次；留空表示本机不同步）：');
+      if(p===null) return Promise.resolve(null);
+      p=p.trim();
+      if(!p) return Promise.resolve(null);
+      localStorage.setItem(PASS_KEY,p);
+    }
+    return Promise.resolve(p);
+  }
+  function flash(t){if(!syncBtn)return;var old=syncBtn.textContent;syncBtn.textContent=t;setTimeout(function(){syncBtn.textContent=old;},1600);}
+  function mergeById(lists){
+    var map={};
+    lists.forEach(function(arr){
+      (arr||[]).forEach(function(h){
+        var id=h.id||hid(h);
+        var cur=map[id];
+        if(!cur || (h.ts||0)>(cur.ts||0) || ((h.ts||0)===(cur.ts||0) && !h.del)) map[id]=h;
+      });
+    });
+    return Object.keys(map).map(function(k){return map[k];});
+  }
+  function doSync(){
+    var ep=getEndpoint();
+    if(!ep){ep=prompt('填写同步端点地址（部署 Cloudflare Worker 后得到的 *.workers.dev 地址）：');if(!ep)return Promise.resolve();ep=ep.trim();localStorage.setItem(EP_KEY,ep);}
+    return getPass().then(function(pass){
+      if(!pass) return;
+      return hashStr(pass).then(function(uid){
+        flash('同步中…');
+        var q='?book='+encodeURIComponent(BOOK)+'&user='+encodeURIComponent(uid);
+        return fetch(ep+q).then(function(r){if(!r.ok)throw new Error('pull '+r.status);return r.json();})
+          .then(function(remote){
+            var merged=mergeById([load(),remote]);
+            save(merged);render();
+            return fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({book:BOOK,user:uid,highlights:merged})});
+          })
+          .then(function(r){if(!r.ok)throw new Error('push '+r.status);return r.json();})
+          .then(function(res){flash('已同步 '+(res.count||0));})
+          .catch(function(e){flash('同步失败');console.error(e);});
+      });
+    });
+  }
+  function nukeAll(){
+    var ep=getEndpoint();
+    getPass().then(function(pass){
+      if(!pass||!ep){save([]);render();return;}
+      flash('清除中…');
+      hashStr(pass).then(function(uid){
+        var q='?book='+encodeURIComponent(BOOK)+'&user='+encodeURIComponent(uid);
+        fetch(ep+q).then(function(r){return r.ok?r.json():[];}).then(function(remote){
+          var ids={};load().forEach(function(h){ids[hid(h)]=true;});(remote||[]).forEach(function(h){ids[h.id||hid(h)]=true;});
+          var now=Date.now();
+          var arr=Object.keys(ids).map(function(id){return {id:id,del:true,ts:now};});
+          save(arr);render();
+          return fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({book:BOOK,user:uid,highlights:arr})});
+        }).then(function(){flash('已清除并同步');}).catch(function(){flash('清除失败');});
+      });
+    });
+  }
+  if(syncBtn) syncBtn.addEventListener('click',function(){doSync();});
+  var syncTimer=null;
+  function scheduleSync(){
+    if(!localStorage.getItem(PASS_KEY)||!getEndpoint()) return;
+    clearTimeout(syncTimer);
+    syncTimer=setTimeout(function(){doSync().catch(function(){});},1500);
+  }
   render();
 })();
 </script>
