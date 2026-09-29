@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/reader.css">
+<link rel="stylesheet" href="../assets/contrast.css">
+{{HEAD_EXTRA}}
+</head>
+<body class="split-on">
+  <div class="reader-split">
+    <section class="pane pane-text"><div class="book-text">
+{{BODY}}
+    </div></section>
+    <div class="divider" title="拖拽调整左右宽度"></div>
+    <aside class="pane pane-notes"></aside>
+  </div>
+  <script id="book-meta" type="application/json">{{META}}</script>
+  <script src="../assets/booknav.js"></script>
+  <script src="../assets/page.js"></script>
+  <script src="../assets/split.js"></script>
+  <script src="../assets/reader.js"></script>
+</body>
+</html>

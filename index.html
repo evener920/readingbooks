@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>我的读书库</title>
 <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
-<meta name="description" content="个人读书库 · 藏书、进度、笔记与摘句">
+<meta name="description" content="个人读书库 · 藏书、进度、笔记与摘句，正文与笔记对照阅读">
 <script>try{var t=localStorage.getItem('rl-theme');if(!t){t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -15,7 +15,7 @@
   <div class="wrap">
     <div class="kicker">My Reading Library</div>
     <h1>我的读书库</h1>
-    <p class="lede">读过的、在读的、想读的，都收在这里。</p>
+    <p class="lede">读过的、在读的、想读的，都收在这里。正文与笔记，左右对照读。</p>
     <div class="rule"></div>
   </div>
 </header>
@@ -24,35 +24,39 @@
   <section class="stats" id="stats"></section>
 </div>
 
-<div class="toolbar">
-  <div class="wrap toolbar-inner">
-    <div class="search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="搜书名 / 作者 / 标签" autocomplete="off">
+<div class="layout wrap">
+  <aside class="cats" id="cats" aria-label="分类导航">
+    <div class="cats-title">分类</div>
+    <div class="cats-list" id="catsList"></div>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="搜书名 / 作者 / 标签" autocomplete="off">
+      </div>
+      <div class="chips">
+        <button class="chip active" data-status="all">全部</button>
+        <button class="chip" data-status="reading">在读</button>
+        <button class="chip" data-status="done">已读</button>
+        <button class="chip" data-status="wish">想读</button>
+      </div>
+      <select class="sort" id="sort">
+        <option value="recent">按时间</option>
+        <option value="title">按书名</option>
+        <option value="rating">按评分</option>
+        <option value="progress">按进度</option>
+      </select>
+      <button class="icon-btn" id="themeBtn" title="切换明暗"></button>
     </div>
-    <div class="chips">
-      <button class="chip active" data-status="all">全部</button>
-      <button class="chip" data-status="reading">在读</button>
-      <button class="chip" data-status="done">已读</button>
-      <button class="chip" data-status="wish">想读</button>
-    </div>
-    <select class="cat" id="cat"></select>
-    <select class="sort" id="sort">
-      <option value="recent">按时间</option>
-      <option value="title">按书名</option>
-      <option value="rating">按评分</option>
-      <option value="progress">按进度</option>
-    </select>
-    <button class="icon-btn" id="themeBtn" title="切换明暗"></button>
-  </div>
+
+    <section class="grid" id="grid"></section>
+  </main>
 </div>
 
-<main class="wrap">
-  <section class="grid" id="grid"></section>
-</main>
-
 <footer class="wrap">
-  <div>点封面进入该书的页面 · 加书：<code>双击 加书.command</code> 或编辑 <code>data/books.js</code></div>
+  <div>点封面进入该书「正文 ⇄ 笔记」对照页 · 加书：<code>python3 scripts/book_tool.py add --text 正文.html</code></div>
 </footer>
 
 <script src="data/books.js"></script>

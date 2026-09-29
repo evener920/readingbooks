@@ -1,0 +1,104 @@
+/* ── 阅读增强：引导式阅读（与读书库双栏书页配套） ── */
+
+/* 主工具栏 */
+.reader-toolbar{
+  position:fixed; left:50%; bottom:54px; transform:translateX(-50%);
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;
+  max-width:94vw;
+  background:rgba(245,240,230,.96); border:1px solid #d9cdb4;
+  border-radius:30px; padding:7px 14px; z-index:9999;
+  font-family:"Songti SC","STSong",serif; font-size:14px; color:#2b2620;
+  box-shadow:0 6px 22px rgba(60,40,20,.18);
+}
+.reader-toolbar button{
+  border:1px solid #d9cdb4; background:#fffdf8; color:#2f4f3e;
+  border-radius:18px; padding:5px 11px; cursor:pointer;
+  font-family:inherit; font-size:14px; transition:.15s; white-space:nowrap;
+}
+.reader-toolbar button:hover{ border-color:#9c4a3c; }
+.reader-toolbar button.on{ background:#2f4f3e; color:#fff; border-color:#2f4f3e; }
+.reader-toolbar input[type=range]{ width:88px; accent-color:#9c4a3c; }
+.reader-toolbar .lab{ color:#7a6f5d; font-size:12px; }
+.reader-toolbar .wpmv{ color:#9c4a3c; font-size:12px; min-width:26px; }
+
+/* 进度条 */
+.reader-progress{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+  width:min(680px,92vw); z-index:9999; }
+.reader-progress input[type=range]{ width:100%; accent-color:#2f4f3e; cursor:pointer; }
+
+/* 逐句引导：当前句淡朱砂底 + 波浪下划线（CSS Custom Highlight API，零 DOM 改动） */
+::highlight(sentence){
+  background:rgba(156,74,60,.13);
+  text-decoration:underline wavy rgba(156,74,60,.60);
+  text-underline-offset:3px; text-decoration-thickness:1.5px;
+}
+
+/* 波浪逐字浮现浮层（分块激活，只读当前块） */
+.r-wave{
+  position:fixed; pointer-events:none; z-index:9998;
+  text-align:center; font-weight:600;
+  transform-origin:center center;
+  transition:left .12s ease, top .12s ease, width .12s ease,
+             height .12s ease, font-size .12s ease, color .12s ease;
+  will-change:left, top, width, height, font-size;
+  text-shadow:0 1px 3px rgba(120,30,20,.30);
+}
+
+/* 聚光：非当前块淡出 */
+.dimmed{ opacity:.20 !important; transition:opacity .3s ease; }
+
+/* 选起点提示 */
+.reader-picktip{
+  position:fixed; left:50%; top:18px; transform:translateX(-50%);
+  background:rgba(47,79,62,.94); color:#fff; padding:6px 16px; border-radius:20px;
+  font-family:"Songti SC","STSong",serif; font-size:13px; z-index:10000;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+
+/* 大纲（章节）面板 */
+.reader-outline{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(40,30,20,.32); z-index:10001;
+}
+.reader-outline > div{ max-height:70vh; overflow:auto; }
+.reader-outline .ol-title, .ol-empty{
+  background:#faf6ec; color:#2f4f3e; padding:14px 22px; font-size:15px;
+  border-radius:14px 14px 0 0; font-family:"Songti SC","STSong",serif;
+}
+.reader-outline .ol-empty{ border-radius:14px; }
+.reader-outline .ol-item{
+  display:block; width:340px; max-width:86vw; text-align:left;
+  background:#fffdf8; color:#2b2620; border:none; border-top:1px solid #ece3cf;
+  padding:11px 22px; font-family:"Songti SC","STSong",serif; font-size:14px; cursor:pointer;
+}
+.reader-outline .ol-item:last-child{ border-radius:0 0 14px 14px; }
+.reader-outline .ol-item:hover{ background:#f3ece0; color:#9c4a3c; }
+
+/* 退出询问条（进度保护） */
+.reader-exit{
+  position:fixed; left:50%; bottom:96px; transform:translateX(-50%);
+  display:none; flex-direction:column; align-items:center; gap:8px;
+  background:#fffdf8; border:1px solid #d9cdb4; border-radius:16px; padding:14px 20px;
+  z-index:10002; font-family:"Songti SC","STSong",serif; color:#2b2620;
+  box-shadow:0 8px 26px rgba(60,40,20,.22);
+}
+.reader-exit .re-title{ font-size:14px; }
+.reader-exit .re-btns{ display:flex; gap:8px; }
+.reader-exit .re-btns button{
+  border:1px solid #d9cdb4; background:#faf6ec; color:#2f4f3e;
+  border-radius:16px; padding:6px 14px; cursor:pointer; font-family:inherit; font-size:13px;
+}
+.reader-exit .re-btns button:hover{ border-color:#9c4a3c; }
+
+/* 用户划词高亮（CSS Custom Highlight API） */
+::highlight(reader){ background:rgba(168,57,43,.20); border-radius:3px; }
+
+/* ── 京华老宋体 ──
+   若本机已安装「京华老宋体」，阅读区会自动启用；否则回退到松墨宋体系。
+   要真正内嵌字体，把 woff2 放到 assets/fonts/jinghua.woff2 并取消下面注释：
+@font-face{
+  font-family:"京华老宋体";
+  src:url("../assets/fonts/jinghua.woff2") format("woff2");
+  font-display:swap;
+}
+*/

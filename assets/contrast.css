@@ -1,0 +1,98 @@
+/* ── 书页双栏对照：左正文 / 右笔记 ── */
+/* 桌面：两栏各自滚动、可拖拽中缝调宽；移动端：上下堆叠、整页滚动 */
+
+html.split-on, body.split-on { height: 100%; }
+body.split-on { overflow: hidden; }
+
+.reader-split {
+  display: flex;
+  align-items: stretch;
+  height: 100vh;
+  width: 100%;
+  background: var(--bg, #f6f4ef);
+}
+.pane {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.pane-text {
+  flex: 0 0 var(--text-w, 52%);
+  border-right: 1px solid var(--border, #e7e3d9);
+}
+/* 正文页自带 .wrap 内边距，这里不再额外加 */
+.book-text { padding: 0; }
+
+.pane-notes {
+  background: var(--surface-2, #fbfaf6);
+  padding: 0;
+}
+
+/* 中缝拖拽条 */
+.divider {
+  flex: none;
+  width: 8px;
+  cursor: col-resize;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.05), rgba(0,0,0,0) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,.05)),
+    repeating-linear-gradient(0deg, var(--border-strong, #d8d3c6) 0 1px, transparent 1px 9px);
+  position: relative;
+  transition: background-color .15s;
+}
+.divider:hover, .divider.drag {
+  background:
+    linear-gradient(90deg, rgba(47,87,71,.18), rgba(47,87,71,0) 45%, rgba(47,87,71,0) 55%, rgba(47,87,71,.18)),
+    repeating-linear-gradient(0deg, var(--accent, #2f5747) 0 1px, transparent 1px 9px);
+}
+.divider::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 4px; height: 34px; transform: translate(-50%, -50%);
+  border-radius: 3px; background: var(--border-strong, #d8d3c6);
+}
+
+/* 右栏：笔记文档 / 占位 */
+.notes-doc { padding: 30px 26px 70px; max-width: 760px; margin: 0 auto; }
+.notes-doc h1, .notes-doc h2, .notes-doc h3 { color: var(--accent, #2f5747); letter-spacing: 1px; }
+.notes-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; min-height: 40vh; text-align: center; color: var(--text-3, #9c968a);
+  font-family: var(--font-serif, serif); padding: 24px;
+}
+.notes-empty .ne-ico { font-size: 34px; margin-bottom: 10px; opacity: .55; }
+.notes-empty .ne-tip { font-size: 13px; color: var(--text-2, #6d685d); margin-top: 8px; max-width: 280px; line-height: 1.7; }
+
+/* 右栏内置数据笔记（无独立笔记页时） */
+.notes-data { padding: 30px 26px 70px; max-width: 720px; margin: 0 auto; }
+.notes-data h2 { font-family: var(--font-serif, serif); color: var(--accent, #2f5747); font-size: 20px; letter-spacing: 2px; margin: 0 0 14px; }
+.notes-data .nd-note {
+  background: var(--surface, #fff); border: 1px solid var(--border, #e7e3d9);
+  border-left: 3px solid var(--accent, #2f5747); border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 12px; font-size: 15px; line-height: 1.8; color: var(--text, #23211c);
+}
+.notes-data .nd-quote {
+  font-family: var(--font-serif, serif); color: var(--cinnabar, #a8392b);
+  border-top: 1px dashed var(--border-strong, #d8d3c6); margin-top: 18px; padding-top: 12px;
+  font-size: 15.5px; line-height: 1.9;
+}
+.notes-data .nd-quote::before { content: "“"; }
+.notes-data .nd-quote::after { content: "”"; }
+
+/* 移动端：上下堆叠 */
+@media (max-width: 860px) {
+  html.split-on, body.split-on { height: auto; overflow: auto; }
+  .reader-split { flex-direction: column; height: auto; min-height: 100vh; }
+  .pane { height: auto; overflow: visible; }
+  .pane-text { border-right: none; border-bottom: 1px solid var(--border, #e7e3d9); }
+  .divider { display: none; }
+  .notes-doc, .notes-data { padding: 24px 18px 60px; }
+}
+
+/* 让书页自带的悬浮导航条让开中央的引导阅读控件（移到左下角） */
+.rlbn-pill {
+  bottom: 86px !important;
+  left: 16px !important;
+  transform: none !important;
+}

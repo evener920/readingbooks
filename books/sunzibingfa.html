@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>孙子兵法 · 深度阅读</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/reader.css">
+<link rel="stylesheet" href="../assets/contrast.css">
 <style>
 :root{
   --bg:#f7f2e9; --card:#fffdf8; --ink:#2f2b26; --sub:#6b6257;
@@ -110,7 +113,9 @@ footer .note{margin-top:14px;font-size:12.5px;color:#9a8f7d}
 @media(max-width:720px){.file,.route{grid-template-columns:1fr}.hero h1{font-size:34px;letter-spacing:6px}}
 </style>
 </head>
-<body>
+<body class="split-on">
+  <div class="reader-split">
+    <section class="pane pane-text"><div class="book-text">
 <div class="wrap">
 
   <header class="hero">
@@ -494,5 +499,14 @@ footer .note{margin-top:14px;font-size:12.5px;color:#9a8f7d}
   </footer>
 
 </div>
+    </div></section>
+    <div class="divider" title="拖拽调整左右宽度"></div>
+    <aside class="pane pane-notes"></aside>
+  </div>
+  <script id="book-meta" type="application/json">{"title": "孙子兵法", "notes": "", "quotes": []}</script>
+  <script src="../assets/booknav.js"></script>
+  <script src="../assets/page.js"></script>
+  <script src="../assets/split.js"></script>
+  <script src="../assets/reader.js"></script>
 </body>
 </html>

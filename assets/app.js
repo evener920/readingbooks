@@ -197,6 +197,33 @@
       : '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>';
   }
 
+  /* ------------------------------------------------------ 分类侧栏 -- */
+  function renderCats() {
+    var counts = {};
+    BOOKS.forEach(function (b) {
+      var c = b.category || "未分类";
+      counts[c] = (counts[c] || 0) + 1;
+    });
+    var cats = Object.keys(counts).sort(function (a, b) {
+      if (a === "未分类") return 1; if (b === "未分类") return -1; return a.localeCompare(b, "zh-Hans-CN");
+    });
+    var html = '<button class="cat-item' + (state.cat === "all" ? " active" : "") + '" data-cat="all">' +
+      '<span class="ci-name">全部</span><span class="ci-num">' + BOOKS.length + "</span></button>";
+    html += cats.map(function (c) {
+      return '<button class="cat-item' + (state.cat === c ? " active" : "") + '" data-cat="' + esc(c) + '">' +
+        '<span class="ci-name">' + esc(c) + '</span><span class="ci-num">' + counts[c] + "</span></button>";
+    }).join("");
+    $("#catsList").innerHTML = html;
+    document.querySelectorAll(".cat-item").forEach(function (el) {
+      el.onclick = function () {
+        document.querySelectorAll(".cat-item").forEach(function (x) { x.classList.remove("active"); });
+        el.classList.add("active");
+        state.cat = el.dataset.cat;
+        render();
+      };
+    });
+  }
+
   /* ------------------------------------------------------------ 启动 -- */
   function init() {
     setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light");
@@ -204,12 +231,6 @@
     $("#themeBtn").onclick = function () {
       setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
     };
-
-    /* 分类下拉 */
-    var cats = [];
-    BOOKS.forEach(function (b) { if (b.category && cats.indexOf(b.category) < 0) cats.push(b.category); });
-    $("#cat").innerHTML = '<option value="all">全部分类</option>' +
-      cats.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("");
 
     var t;
     $("#q").addEventListener("input", function (e) {
@@ -227,10 +248,10 @@
       };
     });
 
-    $("#cat").onchange = function () { state.cat = this.value; render(); };
     $("#sort").onchange = function () { state.sort = this.value; render(); };
 
     renderStats();
+    renderCats();
     render();
   }
 
