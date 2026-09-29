@@ -117,9 +117,23 @@
 .rb-nav .rb-t{color:#6b655a;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 body{padding-top:46px}
 </style>
+<style>
+  /* ------- 手动高亮（划词） ------- */
+  ::highlight(user){background:rgba(214,178,64,.42)}
+  .hl-bar{position:fixed;z-index:10000;display:none;align-items:center;gap:4px;background:#fffdf8;
+    border:1px solid #e4dccd;border-radius:10px;box-shadow:0 8px 24px rgba(80,70,50,.18);
+    padding:4px 5px;font-family:"Noto Sans SC","PingFang SC",system-ui,sans-serif;font-size:13px}
+  .hl-bar button{border:none;background:transparent;cursor:pointer;padding:4px 11px;border-radius:7px;
+    font-size:13px;line-height:1.4;color:#33302a}
+  .hl-bar button:hover{background:#f1ebdf}
+  .hl-bar .hl-add{color:#9a3b2e;font-weight:600}
+  .hl-bar .hl-clr{color:#37535e}
+  .rb-clear{margin-left:auto;color:#9a3b2e;text-decoration:none;font-weight:600;cursor:pointer}
+  .rb-clear:hover{text-decoration:underline}
+</style>
 </head>
 <body>
-<header class="rb-nav"><a class="rb-home" href="../index.html">← 读书库</a><span class="rb-sep">·</span><span class="rb-t">夜晚的潜水艇 · 陈春成（AI 阅读笔记版）</span></header>
+<header class="rb-nav"><a class="rb-home" href="../index.html">← 读书库</a><span class="rb-sep">·</span><span class="rb-t">夜晚的潜水艇 · 陈春成（AI 阅读笔记版）</span><span class="rb-sep">·</span><a class="rb-clear" id="hlClear" href="javascript:void(0)">清除高亮</a></header>
   <div class="layout">
     <main class="text-col">
   <section class="title-page" id="top">
@@ -904,5 +918,86 @@ body{padding-top:46px}
     </div>
   </aside>
   </div>
+<div class="hl-bar" id="hlBar">
+  <button class="hl-add" id="hlAdd">✎ 高亮</button>
+  <button class="hl-clr" id="hlClr">清除全部</button>
+</div>
+<script>
+(function(){
+  var root = document.querySelector('.text-col');
+  if(!root) return;
+  var KEY = 'yedy-hl-' + (document.title||'page');
+  var bar = document.getElementById('hlBar');
+  var addBtn = document.getElementById('hlAdd');
+  var clrBtn = document.getElementById('hlClr');
+  var pending = null;
+
+  function textNodes(){var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),a=[],n;while((n=w.nextNode()))a.push(n);return a;}
+  function offsetOf(node,off){var ns=textNodes(),t=0;for(var i=0;i<ns.length;i++){if(ns[i]===node)return t+off;t+=ns[i].nodeValue.length;}return t;}
+  function atOffset(target){var ns=textNodes(),t=0;for(var i=0;i<ns.length;i++){var L=ns[i].nodeValue.length;if(t+L>=target)return{node:ns[i],offset:target-t};t+=L;}var last=ns[ns.length-1];return{node:last,offset:last.nodeValue.length};}
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){return[];}}
+  function save(a){localStorage.setItem(KEY,JSON.stringify(a));}
+  function render(){
+    if(!window.CSS||!CSS.highlights) return;
+    var arr=load(),rs=[];
+    arr.forEach(function(h){var a=atOffset(h.start),b=atOffset(h.end);if(a.node===b.node&&a.offset===b.offset)return;var r=new Range();r.setStart(a.node,a.offset);r.setEnd(b.node,b.offset);rs.push(r);});
+    CSS.highlights.set('user', new Highlight.apply(null, rs));
+  }
+  function selOffsets(){
+    var sel=window.getSelection();
+    if(!sel||sel.isCollapsed||sel.rangeCount===0) return null;
+    var r=sel.getRangeAt(0);
+    if(!root.contains(r.startContainer)||!root.contains(r.endContainer)) return null;
+    var s=offsetOf(r.startContainer,r.startOffset), e=offsetOf(r.endContainer,r.endOffset);
+    if(s===e) return null;
+    if(s>e){var t=s;s=e;e=t;}
+    return {start:s,end:e};
+  }
+  function showBar(rect){
+    bar.style.display='flex';
+    var x=rect.left+rect.width/2-60, y=rect.top-46;
+    if(y<8) y=rect.bottom+8;
+    bar.style.left=Math.max(8,x)+'px';
+    bar.style.top=y+'px';
+  }
+  function hideBar(){bar.style.display='none';pending=null;}
+  document.addEventListener('mouseup',function(){
+    setTimeout(function(){
+      var o=selOffsets();
+      if(!o){hideBar();return;}
+      pending=o;
+      var r=window.getSelection().getRangeAt(0).getBoundingClientRect();
+      showBar(r);
+    },10);
+  });
+  document.addEventListener('selectionchange',function(){var sel=window.getSelection();if(sel&&sel.isCollapsed)hideBar();});
+  window.addEventListener('scroll',hideBar,true);
+  addBtn.addEventListener('mousedown',function(e){e.preventDefault();});
+  addBtn.addEventListener('click',function(){
+    if(!pending) return;
+    var arr=load();arr.push(pending);save(arr);render();hideBar();
+    window.getSelection().removeAllRanges();
+  });
+  clrBtn.addEventListener('mousedown',function(e){e.preventDefault();});
+  clrBtn.addEventListener('click',function(){save([]);render();hideBar();});
+  function offsetAtPoint(x,y){
+    var r=null;
+    if(document.caretRangeFromPoint) r=document.caretRangeFromPoint(x,y);
+    else if(document.caretPositionFromPoint){var p=document.caretPositionFromPoint(x,y);if(p)r={startContainer:p.offsetNode,startOffset:p.offset};}
+    if(r&&root.contains(r.startContainer)) return offsetOf(r.startContainer,r.startOffset);
+    return -1;
+  }
+  root.addEventListener('dblclick',function(e){
+    var off=offsetAtPoint(e.clientX,e.clientY);
+    if(off<0) return;
+    var arr=load();
+    var keep=arr.filter(function(h){return !(off>=h.start&&off<h.end);});
+    if(keep.length!==arr.length){save(keep);render();}
+  });
+  var clearAll=document.getElementById('hlClear');
+  if(clearAll) clearAll.addEventListener('click',function(){save([]);render();});
+  render();
+})();
+</script>
 </body>
 </html>
