@@ -236,5 +236,28 @@ window.BOOKS = [
     "notes": "",
     "quotes": [],
     "link": ""
+  },
+  {
+    "id": "夜晚的潜水艇",
+    "title": "夜晚的潜水艇",
+    "author": "陈春成",
+    "translator": "",
+    "publisher": "",
+    "year": 0,
+    "category": "小说",
+    "tags": [
+      "短篇小说",
+      "AI笔记"
+    ],
+    "status": "done",
+    "progress": 0,
+    "rating": 0,
+    "startedAt": "",
+    "finishedAt": "",
+    "cover": "",
+    "summary": "陈春成短篇小说集，含《夜晚的潜水艇》《竹峰寺》《传彩笔》等九篇，附 AI 解读笔记",
+    "notes": "",
+    "quotes": [],
+    "link": ""
   }
 ];
