@@ -91,16 +91,16 @@
     var cards = document.querySelectorAll('.notes-panel .note-card');
     var tocs  = document.querySelectorAll('.toc-item');
     var chapters = document.querySelectorAll('.chapter');
-    function show(i){
-      cards.forEach(function(c){c.classList.toggle('show', +c.dataset.note === i);});
+    function show(i){ // i = 章节序号(0基)；卡片序号 = i+1（0 为全书总览）
+      cards.forEach(function(c){c.classList.toggle('show', +c.dataset.note === i+1);});
       tocs.forEach(function(t){t.classList.toggle('active', +t.dataset.t === i);});
     }
-    show(-1); show(0); // start with overview
+    show(0); // 起始：第一篇《夜晚的潜水艇》——卡片与目录同时高亮
     var obs = new IntersectionObserver(function(es){
       es.forEach(function(e){
         if(e.isIntersecting){
           var i = +e.target.id.replace('ch','');
-          show(i+1);
+          show(i);
         }
       });
     },{rootMargin:'-20% 0px -65% 0px'});
