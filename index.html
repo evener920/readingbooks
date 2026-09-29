@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>我的读书库</title>
-<link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+<title>我的读书库 · 私人藏书阁</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='8' y='8' width='84' height='84' rx='12' fill='%23a8322a'/%3E%3Crect x='17' y='17' width='66' height='66' rx='7' fill='none' stroke='%23f6f4ef' stroke-width='4'/%3E%3Ctext x='50' y='52' text-anchor='middle' dominant-baseline='central' fill='%23f6f4ef' font-family='serif' font-size='46' font-weight='700'%3E藏%3C/text%3E%3C/svg%3E" type="image/svg+xml">
 <meta name="description" content="个人读书库 · 藏书、进度、笔记与摘句，正文与笔记对照阅读">
 <script>try{var t=localStorage.getItem('rl-theme');if(!t){t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="assets/style.css">
@@ -12,17 +12,28 @@
 <body>
 
 <header class="hero">
-  <div class="wrap">
-    <div class="kicker">My Reading Library</div>
+  <div class="hero-bg" aria-hidden="true">
+    <svg class="hero-mountain" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M0,260 C240,180 420,300 720,220 C1020,140 1200,300 1440,200 L1440,320 L0,320 Z"></path>
+      <path d="M0,300 C300,250 520,320 840,260 C1100,210 1280,310 1440,270 L1440,320 L0,320 Z" opacity="0.5"></path>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <div class="seal" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <rect x="6" y="6" width="88" height="88" rx="11" fill="#a8322a"></rect>
+        <rect x="15" y="15" width="70" height="70" rx="7" fill="none" stroke="#f6f4ef" stroke-width="4"></rect>
+        <text x="50" y="53" text-anchor="middle" dominant-baseline="central" fill="#f6f4ef" font-family="Songti SC, STSong, serif" font-size="46" font-weight="700">藏</text>
+      </svg>
+    </div>
+    <div class="kicker">My Reading Library · 私人藏书阁</div>
     <h1>我的读书库</h1>
-    <p class="lede">读过的、在读的、想读的，都收在这里。正文与笔记，左右对照读。</p>
-    <div class="rule"></div>
+    <p class="lede">书卷多情似故人，晨昏忧乐每相亲。<br>读过的、在读的、想读的，皆于此安放；正文与笔记，左右相对而读。</p>
+    <div class="hero-rule"><span></span><i>❖</i><span></span></div>
   </div>
 </header>
 
-<div class="wrap">
-  <section class="stats" id="stats"></section>
-</div>
+<div class="statbar" id="stats"></div>
 
 <div class="layout wrap">
   <aside class="cats" id="cats" aria-label="分类导航">

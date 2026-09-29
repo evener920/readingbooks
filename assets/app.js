@@ -124,9 +124,9 @@
       return (b.notes && String(b.notes).trim()) || (b.quotes && b.quotes.length);
     }).length;
     var data = [[total, "藏书"], [reading, "在读"], [done, "已读"], [notes, "有笔记"]];
-    $("#stats").innerHTML = data.map(function (d) {
-      return '<div class="stat"><div class="num">' + d[0] + '</div><div class="lbl">' + d[1] + "</div></div>";
-    }).join("");
+    $("#stats").innerHTML = '<div class="sb-wrap">' + data.map(function (d) {
+      return '<div class="sb"><b>' + d[0] + '</b><span>' + d[1] + "</span></div>";
+    }).join('<i class="sb-sep"></i>') + "</div>";
   }
 
   /* ------------------------------------------------------ 筛选 / 排序 -- */
